@@ -1,0 +1,217 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   DESIGN TOKENS — FinTrack
+   Paleta exclusivamente em tons de cinza (claro → escuro)
+   ============================================================
+
+   TOKEN MAP (onde cada cor aparece na interface):
+   --background        → fundo geral da página
+   --foreground        → texto principal
+   --card              → fundo dos cards/painéis
+   --card-foreground   → texto dentro dos cards
+   --popover           → fundo de dropdowns e tooltips
+   --popover-foreground→ texto dentro de popover
+   --primary           → botões primários, CTA, ícones ativos
+   --primary-foreground→ texto sobre botão primário
+   --secondary         → botões secundários, badges neutros
+   --secondary-foreground → texto sobre secundário
+   --muted             → áreas de fundo sutis (input bg, tabela zebra)
+   --muted-foreground  → texto de placeholder e legendas
+   --accent            → hover de itens de menu/lista
+   --accent-foreground → texto sobre accent
+   --destructive       → botões/mensagens de erro/exclusão
+   --border            → bordas de inputs, cards, separadores
+   --input             → fundo dos campos de formulário
+   --ring              → anel de foco (outline)
+   --chart-1..5        → séries dos gráficos do Dashboard
+   --sidebar           → fundo da barra lateral
+   --sidebar-foreground→ texto da sidebar
+   --sidebar-primary   → item ativo na sidebar (texto + ícone)
+   --sidebar-accent    → hover na sidebar
+   --sidebar-border    → separadores da sidebar
+   ============================================================ */
+
+@theme inline {
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ============================================================
+   TEMA CLARO — tons de cinza claro (fundo quase branco)
+   ============================================================ */
+:root {
+  color-scheme: light;
+
+  /* Fundo geral da página — cinza muito claro, quase branco */
+  --background: oklch(0.97 0 0);
+
+  /* Texto principal — cinza muito escuro */
+  --foreground: oklch(0.13 0 0);
+
+  /* Cards e painéis — branco puro */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.13 0 0);
+
+  /* Popover / dropdown */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.13 0 0);
+
+  /* Botão primário — cinza escuro (quase preto) */
+  --primary: oklch(0.18 0 0);
+  --primary-foreground: oklch(0.98 0 0);
+
+  /* Botão secundário — cinza claro */
+  --secondary: oklch(0.93 0 0);
+  --secondary-foreground: oklch(0.18 0 0);
+
+  /* Áreas sutis de fundo, input bg */
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.50 0 0);
+
+  /* Hover de itens de menu */
+  --accent: oklch(0.93 0 0);
+  --accent-foreground: oklch(0.18 0 0);
+
+  /* Erros e ações destrutivas */
+  --destructive: oklch(0.577 0.245 27.325);
+
+  /* Bordas e inputs */
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.93 0 0);
+
+  /* Anel de foco */
+  --ring: oklch(0.55 0 0);
+
+  /* Gráficos — escala de cinza para séries do Dashboard */
+  --chart-1: oklch(0.25 0 0); /* série 1 — cinza muito escuro */
+  --chart-2: oklch(0.40 0 0); /* série 2 — cinza escuro */
+  --chart-3: oklch(0.55 0 0); /* série 3 — cinza médio */
+  --chart-4: oklch(0.70 0 0); /* série 4 — cinza claro */
+  --chart-5: oklch(0.85 0 0); /* série 5 — cinza muito claro */
+
+  --radius: 0.5rem;
+
+  /* Barra lateral — fundo branco com borda sutil */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.13 0 0);
+  --sidebar-primary: oklch(0.18 0 0);          /* item ativo */
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.93 0 0);           /* hover */
+  --sidebar-accent-foreground: oklch(0.18 0 0);
+  --sidebar-border: oklch(0.88 0 0);
+  --sidebar-ring: oklch(0.55 0 0);
+}
+
+/* ============================================================
+   TEMA ESCURO — tons de cinza escuro (fundo quase preto)
+   ============================================================ */
+.dark {
+  color-scheme: dark;
+
+  /* Fundo geral — cinza muito escuro */
+  --background: oklch(0.12 0 0);
+
+  /* Texto principal — cinza muito claro */
+  --foreground: oklch(0.95 0 0);
+
+  /* Cards — cinza escuro, ligeiramente mais claro que o fundo */
+  --card: oklch(0.17 0 0);
+  --card-foreground: oklch(0.95 0 0);
+
+  /* Popover / dropdown */
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.95 0 0);
+
+  /* Botão primário — cinza muito claro (quase branco) */
+  --primary: oklch(0.92 0 0);
+  --primary-foreground: oklch(0.15 0 0);
+
+  /* Botão secundário — cinza médio-escuro */
+  --secondary: oklch(0.24 0 0);
+  --secondary-foreground: oklch(0.95 0 0);
+
+  /* Áreas sutis de fundo */
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.60 0 0);
+
+  /* Hover de itens */
+  --accent: oklch(0.24 0 0);
+  --accent-foreground: oklch(0.95 0 0);
+
+  /* Erros */
+  --destructive: oklch(0.704 0.191 22.216);
+
+  /* Bordas e inputs */
+  --border: oklch(1 0 0 / 8%);
+  --input: oklch(1 0 0 / 10%);
+
+  /* Anel de foco */
+  --ring: oklch(0.60 0 0);
+
+  /* Gráficos — escala inversa para contraste no fundo escuro */
+  --chart-1: oklch(0.90 0 0); /* série 1 — cinza muito claro */
+  --chart-2: oklch(0.72 0 0); /* série 2 — cinza claro */
+  --chart-3: oklch(0.55 0 0); /* série 3 — cinza médio */
+  --chart-4: oklch(0.38 0 0); /* série 4 — cinza escuro */
+  --chart-5: oklch(0.25 0 0); /* série 5 — cinza muito escuro */
+
+  /* Barra lateral — cinza ligeiramente mais claro que o fundo */
+  --sidebar: oklch(0.17 0 0);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.92 0 0);           /* item ativo */
+  --sidebar-primary-foreground: oklch(0.15 0 0);
+  --sidebar-accent: oklch(0.24 0 0);            /* hover */
+  --sidebar-accent-foreground: oklch(0.95 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.60 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

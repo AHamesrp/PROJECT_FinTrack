@@ -119,6 +119,12 @@ export default function NovoExtratoPage() {
     setUploadAttempts(0)
     setRateLimited(false)
 
+    try {
+      await fetch(`/api/statements/${stmt.id}/process`, { method: 'POST' })
+    } catch {
+      // Ignore processing startup errors; the statement remains registered for follow-up processing.
+    }
+
     setStatementId(stmt.id)
     setStatus('done')
   }

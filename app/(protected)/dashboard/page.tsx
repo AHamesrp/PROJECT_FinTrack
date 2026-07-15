@@ -9,7 +9,11 @@ import { Upload } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    return null
+  }
 
   /* Busca o extrato mais recente do usuário */
   const { data: statements } = await supabase

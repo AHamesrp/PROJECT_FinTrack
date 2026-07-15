@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Upload, FileText, X, CheckCircle2, Loader2, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { validateStatementFile, sanitizeStatementFileName } from '@/lib/security'
 
 type UploadStatus = 'idle' | 'uploading' | 'processing' | 'done' | 'error'
 
@@ -21,22 +23,20 @@ export default function NovoExtratoPage() {
   const [status, setStatus] = useState<UploadStatus>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [statementId, setStatementId] = useState<string | null>(null)
+  const [uploadAttempts, setUploadAttempts] = useState(0)
+  const [rateLimited, setRateLimited] = useState(false)
 
-  const ALLOWED_TYPES = ['text/csv', 'application/pdf', 'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
-
-  function validateFile(f: File) {
-    if (!ALLOWED_TYPES.includes(f.type) && !f.name.match(/\.(csv|pdf|xlsx|xls|ofx|txt)$/i)) {
-      return 'Formato não suportado. Use CSV, PDF, XLS, XLSX ou OFX.'
+  useEffect(() => {
+    if (uploadAttempts >= 3) {
+      setRateLimited(true)
+      setStatus('error')
+      setErrorMsg('Muitas tentativas de upload. Aguarde alguns minutos antes de tentar novamente.')
     }
-    if (f.size > 10 * 1024 * 1024) {
-      return 'O arquivo não pode ultrapassar 10 MB.'
-    }
-    return null
-  }
+  }, [uploadAttempts])
 
   function handleFileSelect(f: File) {
-    const err = validateFile(f)
+    const validation = validateStatementFile(f)
+    const err = validation.valid ? null : validation.reason
     if (err) {
       setErrorMsg(err)
       return
@@ -62,6 +62,12 @@ export default function NovoExtratoPage() {
 
   async function handleUpload() {
     if (!file) return
+    if (rateLimited) {
+      setStatus('error')
+      setErrorMsg('Muitas tentativas de upload. Aguarde alguns minutos antes de tentar novamente.')
+      return
+    }
+
     setStatus('uploading')
     setErrorMsg(null)
 
@@ -75,7 +81,7 @@ export default function NovoExtratoPage() {
       O script read.py deverá acessar o arquivo por este file_path.
     */
     const timestamp = Date.now()
-    const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const sanitizedName = sanitizeStatementFileName(file.name)
     const filePath = `statements/${user.id}/${timestamp}_${sanitizedName}`
 
     /* Upload do arquivo no Supabase Storage (bucket: "statements") */
@@ -84,6 +90,7 @@ export default function NovoExtratoPage() {
       .upload(filePath, file, { cacheControl: '3600', upsert: false })
 
     if (storageError) {
+      setUploadAttempts((prev) => prev + 1)
       setStatus('error')
       setErrorMsg('Erro ao fazer upload do arquivo. Tente novamente.')
       return
@@ -103,10 +110,14 @@ export default function NovoExtratoPage() {
       .single()
 
     if (dbError || !stmt) {
+      setUploadAttempts((prev) => prev + 1)
       setStatus('error')
       setErrorMsg('Erro ao registrar o extrato. Tente novamente.')
       return
     }
+
+    setUploadAttempts(0)
+    setRateLimited(false)
 
     setStatementId(stmt.id)
     setStatus('done')

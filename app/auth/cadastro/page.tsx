@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Logo } from '@/components/logo'
+import { validatePasswordStrength } from '@/lib/security'
 
 export default function CadastroPage() {
   const [email, setEmail] = useState('')
@@ -23,8 +24,9 @@ export default function CadastroPage() {
       setError('As senhas não coincidem.')
       return
     }
-    if (password.length < 8) {
-      setError('A senha deve ter pelo menos 8 caracteres.')
+    const passwordError = validatePasswordStrength(password)
+    if (passwordError) {
+      setError(passwordError)
       return
     }
 

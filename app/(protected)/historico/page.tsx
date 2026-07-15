@@ -4,7 +4,11 @@ import type { Statement } from '@/lib/types'
 
 export default async function HistoricoPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+  if (userError || !user) {
+    return null
+  }
 
   const { data } = await supabase
     .from('statements')

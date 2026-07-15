@@ -88,11 +88,11 @@ export function HistoricoClient({ statements: initial }: Props) {
     if (!confirm(`Excluir o extrato "${stmt.file_name}"? Esta ação não pode ser desfeita.`)) return
     setDeleting(stmt.id)
 
-    const supabase = createClient()
-    /* Remove o arquivo do storage */
-    await supabase.storage.from('statements').remove([stmt.file_path])
-    /* Remove o registro (cascade deleta as transactions) */
-    await supabase.from('statements').delete().eq('id', stmt.id)
+    const response = await fetch(`/api/statements/${stmt.id}`, { method: 'DELETE' })
+    if (!response.ok) {
+      setDeleting(null)
+      return
+    }
 
     setStatements((prev) => prev.filter((s) => s.id !== stmt.id))
     setDeleting(null)

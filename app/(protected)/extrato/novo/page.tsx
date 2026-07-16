@@ -118,15 +118,24 @@ export default function NovoExtratoPage() {
 
     setUploadAttempts(0)
     setRateLimited(false)
+    setStatus('processing')
 
     try {
-      await fetch(`/api/statements/${stmt.id}/process`, { method: 'POST' })
-    } catch {
-      // Ignore processing startup errors; the statement remains registered for follow-up processing.
-    }
+      const response = await fetch(`/api/statements/${stmt.id}/process`, { method: 'POST' })
+      const result = await response.json()
 
-    setStatementId(stmt.id)
-    setStatus('done')
+      if (!response.ok || !result?.success) {
+        setStatus('error')
+        setErrorMsg(result?.error || 'Erro ao processar o extrato.')
+        return
+      }
+
+      setStatus('done')
+    } catch (error) {
+      setStatus('error')
+      setErrorMsg('Erro ao processar o extrato. Tente novamente.')
+      return
+    }
   }
 
   return (
@@ -158,15 +167,13 @@ export default function NovoExtratoPage() {
             <div className="my-4 h-px bg-border" />
             {/* secondary → caixa informativa sobre o read.py */}
             <div className="rounded-lg bg-muted px-4 py-3 text-left text-sm text-muted-foreground">
-              <p className="font-medium text-foreground">Próximo passo</p>
+              <p className="font-medium text-foreground">Processamento automático</p>
               <p className="mt-1">
-                Execute o script <code className="rounded bg-secondary px-1.5 py-0.5 text-xs font-mono text-foreground">read.py</code> para
-                processar o extrato. O ID do registro é:
+                O extrato será processado imediatamente pelo sistema e os dados serão exibidos no dashboard.
               </p>
-              {/* secondary → campo de ID para o script */}
-              <code className="mt-2 block rounded bg-secondary px-3 py-2 text-xs font-mono text-foreground break-all">
-                {statementId}
-              </code>
+              <div className="mt-3 rounded bg-secondary px-3 py-2 text-xs font-mono text-foreground">
+                ID do extrato: {statementId}
+              </div>
             </div>
             <div className="mt-4 flex gap-3">
               <button
@@ -288,7 +295,7 @@ export default function NovoExtratoPage() {
               <li>XLS / XLSX — planilhas Excel</li>
             </ul>
             <p className="pt-1 text-xs">
-              O processamento é feito pelo script <code className="rounded bg-secondary px-1 font-mono text-foreground">read.py</code> após o upload.
+              O extrato será processado automaticamente após o upload.
             </p>
           </div>
         )}

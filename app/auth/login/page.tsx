@@ -14,6 +14,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [oauthLoading, setOauthLoading] = useState<'google' | 'azure' | null>(null)
+  const [oauthError, setOauthError] = useState<string | null>(null)
 
   /* Etapa 2: verificação 2FA via TOTP */
   const [needsMfa, setNeedsMfa] = useState(false)
@@ -49,6 +51,34 @@ export default function LoginPage() {
 
     router.push('/dashboard')
     router.refresh()
+  }
+
+  async function handleOAuthLogin(provider: 'google' | 'azure') {
+    setError(null)
+    setOauthError(null)
+    setOauthLoading(provider)
+
+    const supabase = createClient()
+    const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        flowType: 'pkce',
+      },
+    })
+
+    if (oauthError) {
+      setOauthError('Não foi possível entrar com esta conta no momento.')
+      setOauthLoading(null)
+      return
+    }
+
+    if (data.url) {
+      window.location.assign(data.url)
+    } else {
+      setOauthError('Não foi possível iniciar o login. Tente novamente.')
+      setOauthLoading(null)
+    }
   }
 
   async function handleMfaVerify(e: React.FormEvent) {
@@ -222,6 +252,50 @@ export default function LoginPage() {
               Entrar
             </button>
           </form>
+
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+                ou continue com
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="grid gap-2">
+              <button
+                type="button"
+                onClick={() => handleOAuthLogin('google')}
+                disabled={oauthLoading !== null}
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                {oauthLoading === 'google' ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <span className="text-base font-semibold">G</span>
+                )}
+                Entrar com Google
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleOAuthLogin('azure')}
+                disabled={oauthLoading !== null}
+                className="flex w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                {oauthLoading === 'azure' ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <span className="text-base font-semibold">M</span>
+                )}
+                Entrar com Microsoft
+              </button>
+            </div>
+
+            {oauthError && (
+              <p className="text-sm text-destructive">{oauthError}</p>
+            )}
+          </div>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
